@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { pb } from '$lib/pb';
+	import { Sunrise, UtensilsCrossed, Coffee, Moon, RefreshCw } from 'lucide-svelte';
 
-	// 1. Types & Config
 	interface MenuRecord {
 		id: string;
 		mess_name: 'Polytechnic' | 'Management';
@@ -16,31 +16,54 @@
 	const expectedMesses = ['Polytechnic', 'Management'] as const;
 
 	const mealConfig = [
-		{ key: 'breakfast' as const, label: 'Breakfast', icon: '🌅', color: 'text-primary' },
-		{ key: 'lunch' as const, label: 'Lunch', icon: '🍲', color: 'text-secondary' },
-		{ key: 'snacks' as const, label: 'Snacks', icon: '☕', color: 'text-accent' },
-		{ key: 'dinner' as const, label: 'Dinner', icon: '🌃', color: 'text-info' }
+		{
+			key: 'breakfast' as const,
+			label: 'Breakfast',
+			icon: Sunrise,
+			time: '7:30 – 9:30 am',
+			badge: 'badge-warning',
+			iconBtn: 'btn-warning'
+		},
+		{
+			key: 'lunch' as const,
+			label: 'Lunch',
+			icon: UtensilsCrossed,
+			time: '12:30 – 2:30 pm',
+			badge: 'badge-success',
+			iconBtn: 'btn-success'
+		},
+		{
+			key: 'snacks' as const,
+			label: 'Snacks',
+			icon: Coffee,
+			time: '4:30 – 5:30 pm',
+			badge: 'badge-accent',
+			iconBtn: 'btn-accent'
+		},
+		{
+			key: 'dinner' as const,
+			label: 'Dinner',
+			icon: Moon,
+			time: '7:30 – 9:30 pm',
+			badge: 'badge-info',
+			iconBtn: 'btn-info'
+		}
 	];
 
-	// 2. Svelte 5 Runes for State
 	let displayRecords = $state<Partial<MenuRecord>[]>([]);
 	let isLoading = $state(true);
 	let errorMsg = $state<string | null>(null);
+	let spinning = $state(false);
 
-	// 3. Logic: Fetch & Normalize
 	const loadMenu = async () => {
 		isLoading = true;
+		spinning = true;
 		errorMsg = null;
-
 		try {
 			const today = new Date().toISOString().split('T')[0];
-
-			// Fetch whatever is available
 			const records = await pb.collection('menu').getFullList<MenuRecord>({
 				filter: `date ~ "${today}"`
 			});
-
-			// Map expected messes to fetched data, or return a placeholder if missing
 			displayRecords = expectedMesses.map((name) => {
 				const found = records.find((r) => r.mess_name === name);
 				return found || { mess_name: name, breakfast: '', lunch: '', snacks: '', dinner: '' };
@@ -49,100 +72,92 @@
 			errorMsg = err.message || 'Failed to connect to PocketBase';
 		} finally {
 			isLoading = false;
+			setTimeout(() => (spinning = false), 600);
 		}
 	};
 
 	onMount(loadMenu);
 </script>
 
-<div class="min-h-screen bg-base-200 p-4 lg:p-12">
-	<div class="mx-auto max-w-7xl">
-		<header class="mb-10 flex flex-col items-end justify-between gap-4 md:flex-row">
+<div class="min-h-screen bg-base-200 p-4 lg:p-10">
+	<div class="mx-auto max-w-4xl">
+		<!-- Header -->
+		<header class="mb-10 flex items-end justify-between">
 			<div>
-				<h1 class="mb-2 text-5xl font-black tracking-tighter text-base-content uppercase">
-					Today's Menu
-				</h1>
-				<p class="text-lg font-medium opacity-60">
-					{new Date().toLocaleDateString('en-GB', { dateStyle: 'full' })}
+				<p class="mb-1 text-sm font-medium tracking-widest text-base-content/40 uppercase">
+					{new Date().toLocaleDateString('en-GB', { weekday: 'long' })}
 				</p>
+				<h1 class="text-4xl font-black tracking-tight text-base-content">What's cooking 🍽️</h1>
 			</div>
-			<div class="flex gap-2">
-				<button
-					class="btn border-base-300 bg-base-100 shadow-sm btn-ghost"
-					onclick={loadMenu}
-					disabled={isLoading}
-				>
-					{#if isLoading}
-						<span class="loading loading-xs loading-spinner"></span>
-					{:else}
-						⟳
-					{/if}
-					Refresh
-				</button>
-			</div>
+			<button
+				class="btn gap-2 rounded-full btn-ghost btn-sm"
+				onclick={loadMenu}
+				disabled={isLoading}
+			>
+				<RefreshCw size={14} class={spinning ? 'animate-spin' : ''} />
+				Refresh
+			</button>
 		</header>
 
 		{#if errorMsg}
-			<div class="alert alert-error shadow-lg">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-6 w-6 shrink-0 stroke-current"
-					fill="none"
-					viewBox="0 0 24 24"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-					/></svg
-				>
+			<div class="alert rounded-2xl alert-error">
 				<span>{errorMsg}</span>
 			</div>
 		{:else if isLoading}
-			<div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-				<div class="h-[500px] w-full skeleton rounded-3xl"></div>
-				<div class="h-[500px] w-full skeleton rounded-3xl"></div>
+			<div class="space-y-4">
+				<div class="h-72 w-full skeleton rounded-3xl"></div>
+				<div class="h-72 w-full skeleton rounded-3xl"></div>
 			</div>
 		{:else}
-			<div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-				{#each displayRecords as mess}
-					<div
-						class="card border-b-8 bg-base-100 shadow-xl {mess.mess_name === 'Polytechnic'
-							? 'border-primary'
-							: 'border-secondary'}"
-					>
+			<div class="space-y-6">
+				{#each displayRecords as mess, i}
+					<div class="card bg-base-100 shadow-md">
 						<div class="card-body p-0">
-							<div class="flex items-center justify-between p-8">
-								<h2 class="card-title text-3xl font-black tracking-tight italic">
-									{mess.mess_name}
-								</h2>
-								<div class="badge badge-ghost font-mono opacity-50">TODAY</div>
+							<!-- Mess header -->
+							<div class="flex items-center justify-between border-b border-base-200 px-6 py-4">
+								<div>
+									<h2 class="text-xl font-black tracking-tight">{mess.mess_name} Mess</h2>
+									<p class="text-xs text-base-content/40">
+										{new Date().toLocaleDateString('en-GB', { dateStyle: 'long' })}
+									</p>
+								</div>
+								<div class="badge {i === 0 ? 'badge-primary' : 'badge-secondary'} badge-outline">
+									Today
+								</div>
 							</div>
 
-							<div class="overflow-x-auto px-2 pb-4">
-								<table class="table w-full table-lg">
-									<thead>
-										<tr class="bg-base-200/50 text-base tracking-widest uppercase">
-											<th class="w-1/3">Meal</th>
-											<th>Menu Item</th>
-										</tr>
-									</thead>
-									<tbody>
-										{#each mealConfig as meal}
-											<tr class="transition-colors hover:bg-base-200/30">
-												<td class="py-6 font-bold">
-													<div class="flex items-center gap-4">
-														<span class="text-2xl">{meal.icon}</span>
-														<span class={meal.color}>{meal.label}</span>
-													</div>
-												</td>
-												<td class="leading-relaxed font-medium text-base-content/80 italic">
-													{mess[meal.key] || 'No items added yet'}
-												</td>
-											</tr>
-										{/each}
-									</tbody>
-								</table>
+							<!-- Meal grid -->
+							<div class="grid grid-cols-2 divide-x divide-y divide-base-200 lg:grid-cols-4">
+								{#each mealConfig as meal}
+									{@const items = mess[meal.key]}
+									<div class="flex flex-col gap-4 p-5">
+										<!-- Meal label -->
+										<div class="flex items-center gap-3">
+											<div
+												class="btn {meal.iconBtn} no-animation pointer-events-none btn-square rounded-xl btn-sm"
+											>
+												<svelte:component this={meal.icon} size={15} />
+											</div>
+											<div>
+												<p class="text-sm leading-none font-bold">{meal.label}</p>
+												<p class="mt-0.5 text-xs text-base-content/40">{meal.time}</p>
+											</div>
+										</div>
+
+										<!-- Pills -->
+										{#if items}
+											<div class="flex flex-wrap gap-1.5">
+												{#each items.split(',') as item}
+													<span class="badge {meal.badge} badge-soft badge-sm">
+														{item.trim()}
+													</span>
+												{/each}
+											</div>
+										{:else}
+											<p class="text-xs text-base-content/30 italic">Not updated yet</p>
+										{/if}
+									</div>
+								{/each}
 							</div>
 						</div>
 					</div>
@@ -153,8 +168,15 @@
 </div>
 
 <style>
-	/* Optional: Smooth transition for the refresh action */
-	:global(html) {
-		scroll-behavior: smooth;
+	:global(.animate-spin) {
+		animation: spin 0.6s linear infinite;
+	}
+	@keyframes spin {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
 	}
 </style>
