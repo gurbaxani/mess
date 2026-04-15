@@ -81,7 +81,6 @@
 
 <div class="min-h-screen bg-base-200 p-4 lg:p-10">
 	<div class="mx-auto max-w-4xl">
-		<!-- Header -->
 		<header class="mb-10 flex items-end justify-between">
 			<div>
 				<p class="mb-1 text-sm font-medium tracking-widest text-base-content/40 uppercase">
@@ -113,7 +112,6 @@
 				{#each displayRecords as mess, i}
 					<div class="card bg-base-100 shadow-md">
 						<div class="card-body p-0">
-							<!-- Mess header -->
 							<div class="flex items-center justify-between border-b border-base-200 px-6 py-4">
 								<div>
 									<h2 class="text-xl font-black tracking-tight">{mess.mess_name} Mess</h2>
@@ -126,17 +124,16 @@
 								</div>
 							</div>
 
-							<!-- Meal grid -->
 							<div class="grid grid-cols-2 divide-x divide-y divide-base-200 lg:grid-cols-4">
 								{#each mealConfig as meal}
 									{@const items = mess[meal.key]}
+									{@const Icon = meal.icon}
 									<div class="flex flex-col gap-4 p-5">
-										<!-- Meal label -->
 										<div class="flex items-center gap-3">
 											<div
 												class="btn {meal.iconBtn} no-animation pointer-events-none btn-square rounded-xl btn-sm"
 											>
-												<svelte:component this={meal.icon} size={15} />
+												<Icon size={15} />
 											</div>
 											<div>
 												<p class="text-sm leading-none font-bold">{meal.label}</p>
@@ -144,7 +141,6 @@
 											</div>
 										</div>
 
-										<!-- Pills -->
 										{#if items}
 											<div class="flex flex-wrap gap-1.5">
 												{#each items.split(',') as item}
