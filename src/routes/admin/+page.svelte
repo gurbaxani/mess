@@ -3,7 +3,8 @@
 	import { pb } from '$lib/pb';
 	import type { MenuResponse } from '../../../pocketbase-types';
 	import {
-		LogOut,
+		Settings,
+		Calendar,
 		Save,
 		Coffee,
 		Sunrise,
@@ -118,11 +119,6 @@
 			isSaving = null;
 		}
 	};
-
-	const handleLogout = () => {
-		pb.authStore.clear();
-		window.location.href = '/admin/login';
-	};
 </script>
 
 <svelte:head>
@@ -150,14 +146,22 @@
 					Today's Menu 👩‍🍳
 				</h1>
 			</div>
-			<button
-				type="button"
-				class="flex items-center gap-2 rounded-2xl border-2 border-error/20 bg-error/5 px-5 py-3 font-bold text-error transition-all hover:bg-error hover:text-error-content hover:shadow-lg hover:shadow-error/15 active:scale-95"
-				onclick={handleLogout}
-			>
-				<LogOut size={18} />
-				Log Out
-			</button>
+			<div class="flex flex-wrap items-center gap-3">
+				<a
+					href="/admin/bulk"
+					class="flex items-center gap-2 rounded-2xl border-2 border-primary/20 bg-primary/5 px-5 py-3 font-bold text-primary transition-all hover:bg-primary hover:text-primary-content hover:shadow-lg hover:shadow-primary/15 active:scale-95"
+				>
+					<Calendar size={18} />
+					Bulk Upload
+				</a>
+				<a
+					href="/admin/profile"
+					class="flex items-center gap-2 rounded-2xl border-2 border-primary/20 bg-primary/5 px-5 py-3 font-bold text-primary transition-all hover:bg-primary hover:text-primary-content hover:shadow-lg hover:shadow-primary/15 active:scale-95"
+				>
+					<Settings size={18} />
+					Settings
+				</a>
+			</div>
 		</header>
 
 		<!-- Mobile/Tablet Tab Switcher -->
