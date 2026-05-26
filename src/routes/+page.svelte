@@ -68,8 +68,8 @@
 				const found = records.find((r) => r.mess_name === name);
 				return found || { mess_name: name, breakfast: '', lunch: '', snacks: '', dinner: '' };
 			});
-		} catch (err: any) {
-			errorMsg = err.message || 'Failed to connect to PocketBase';
+		} catch (err) {
+			errorMsg = err instanceof Error ? err.message : 'Failed to connect to PocketBase';
 		} finally {
 			isLoading = false;
 			setTimeout(() => (spinning = false), 600);
@@ -79,7 +79,7 @@
 	onMount(loadMenu);
 </script>
 
-<div class="min-h-screen bg-base-200 p-4 lg:p-10">
+<div class="p-4 lg:p-10">
 	<div class="mx-auto max-w-4xl">
 		<header class="mb-10 flex items-end justify-between">
 			<div>
@@ -89,6 +89,7 @@
 				<h1 class="text-4xl font-black tracking-tight text-base-content">What's cooking 🍽️</h1>
 			</div>
 			<button
+				type="button"
 				class="btn gap-2 rounded-full btn-ghost btn-sm"
 				onclick={loadMenu}
 				disabled={isLoading}
@@ -109,7 +110,7 @@
 			</div>
 		{:else}
 			<div class="space-y-6">
-				{#each displayRecords as mess, i}
+				{#each displayRecords as mess, i (mess.mess_name)}
 					<div class="card bg-base-100 shadow-md">
 						<div class="card-body p-0">
 							<div class="flex items-center justify-between border-b border-base-200 px-6 py-4">
@@ -125,7 +126,7 @@
 							</div>
 
 							<div class="grid grid-cols-2 divide-x divide-y divide-base-200 lg:grid-cols-4">
-								{#each mealConfig as meal}
+								{#each mealConfig as meal (meal.key)}
 									{@const items = mess[meal.key]}
 									{@const Icon = meal.icon}
 									<div class="flex flex-col gap-4 p-5">
@@ -143,7 +144,7 @@
 
 										{#if items}
 											<div class="flex flex-wrap gap-1.5">
-												{#each items.split(',') as item}
+												{#each items.split(',') as item, idx (item + '-' + idx)}
 													<span class="badge {meal.badge} badge-soft badge-sm">
 														{item.trim()}
 													</span>
