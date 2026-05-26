@@ -10,7 +10,7 @@
 </svelte:head>
 
 <div class="flex min-h-screen flex-col bg-base-200">
-	<main class="flex-grow">
+	<main class="grow">
 		{@render children()}
 	</main>
 	<footer
