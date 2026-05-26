@@ -147,7 +147,7 @@
 				<h1
 					class="font-display text-4xl font-extrabold tracking-tight text-base-content sm:text-5xl"
 				>
-					Today's Menu <span class="inline-block animate-bounce select-none">👩‍🍳</span>
+					Today's Menu 👩‍🍳
 				</h1>
 			</div>
 			<button
