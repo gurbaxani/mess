@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { pb } from '$lib/pb';
-	import { Sunrise, UtensilsCrossed, Coffee, Moon, RefreshCw } from 'lucide-svelte';
+	import { Sunrise, UtensilsCrossed, Coffee, Moon, RefreshCw, User } from 'lucide-svelte';
 
 	interface MenuRecord {
 		id: string;
@@ -54,6 +54,7 @@
 	let isLoading = $state(true);
 	let errorMsg = $state<string | null>(null);
 	let spinning = $state(false);
+	let isAdminLoggedIn = $state(false);
 
 	const loadMenu = async () => {
 		isLoading = true;
@@ -76,7 +77,10 @@
 		}
 	};
 
-	onMount(loadMenu);
+	onMount(() => {
+		isAdminLoggedIn = pb.authStore.isValid;
+		loadMenu();
+	});
 </script>
 
 <div class="p-4 lg:p-10">
@@ -88,15 +92,26 @@
 				</p>
 				<h1 class="text-4xl font-black tracking-tight text-base-content">What's cooking 🍽️</h1>
 			</div>
-			<button
-				type="button"
-				class="btn gap-2 rounded-full btn-ghost btn-sm"
-				onclick={loadMenu}
-				disabled={isLoading}
-			>
-				<RefreshCw size={14} class={spinning ? 'animate-spin' : ''} />
-				Refresh
-			</button>
+			<div class="flex items-center gap-2">
+				{#if isAdminLoggedIn}
+					<a
+						href="/admin"
+						class="animate-in fade-in btn gap-2 rounded-full font-bold btn-sm btn-primary"
+					>
+						<User size={14} />
+						Admin Portal
+					</a>
+				{/if}
+				<button
+					type="button"
+					class="btn gap-2 rounded-full btn-ghost btn-sm"
+					onclick={loadMenu}
+					disabled={isLoading}
+				>
+					<RefreshCw size={14} class={spinning ? 'animate-spin' : ''} />
+					Refresh
+				</button>
+			</div>
 		</header>
 
 		{#if errorMsg}

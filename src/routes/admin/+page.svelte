@@ -5,6 +5,7 @@
 	import {
 		Settings,
 		Calendar,
+		Eye,
 		Save,
 		Coffee,
 		Sunrise,
@@ -147,6 +148,13 @@
 				</h1>
 			</div>
 			<div class="flex flex-wrap items-center gap-3">
+				<a
+					href="/"
+					class="flex items-center gap-2 rounded-2xl border-2 border-primary/20 bg-primary/5 px-5 py-3 font-bold text-primary transition-all hover:bg-primary hover:text-primary-content hover:shadow-lg hover:shadow-primary/15 active:scale-95"
+				>
+					<Eye size={18} />
+					Student View
+				</a>
 				<a
 					href="/admin/bulk"
 					class="flex items-center gap-2 rounded-2xl border-2 border-primary/20 bg-primary/5 px-5 py-3 font-bold text-primary transition-all hover:bg-primary hover:text-primary-content hover:shadow-lg hover:shadow-primary/15 active:scale-95"
